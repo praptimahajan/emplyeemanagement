@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios";
 import { toast } from "sonner";
+import { serverUrl } from "../../Url/url.backend";
 
 function Task() {
   return (
@@ -53,7 +54,7 @@ export const AddTask = ({ setTasks, tasks, dialogRef } ) => {
       
     }
 
-    const response = await axios.post("http://localhost:5200/api/v1/user/addTask", body, config);
+    const response = await axios.post(`${serverUrl || "http://localhost:5200" }/api/v1/user/addTask`, body, config);
 
     console.log(response);
     const data = response.data;
@@ -61,12 +62,13 @@ export const AddTask = ({ setTasks, tasks, dialogRef } ) => {
 
     if(data.success) {
       alert(data.message);
-      toast.success("Task added successfully");
+      await toast.success("Task added successfully");
     }
 
     
     
   }
+
   return (
     <div className="md-flex md-flex-column md-align-items-center m-8 p-8 bg-gradient-to-r from-blue-400 to-purple-400 ">
 
@@ -108,10 +110,10 @@ export const AddTask = ({ setTasks, tasks, dialogRef } ) => {
         </div>
 
 
-        {/* department input field */}
+        {/* Position input field */}
         <div className="mt-4">
           <label className="block font-semibold" htmlFor="email">
-            Department
+            Position
           </label>
           <input
             className="w-full shadow-inner bg-gray-100 rounded-lg placeholder-black text-2xl p-4 border-none block mt-1 "

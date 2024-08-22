@@ -2,6 +2,7 @@
 import axios from "axios";
 import  { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {serverUrl} from "../../../Url/url.backend.js";
 
 function SignUp({setLoginType}) {
   const [firstName, setFirstName] = useState("");
@@ -38,7 +39,7 @@ function SignUp({setLoginType}) {
       },
     }
 
-    const response = await axios.post('http://localhost:5200/api/v1/admin/registerAdmin', body, config);
+    const response = await axios.post(`${serverUrl || "http://localhost:5200" }/api/v1/admin/registerAdmin`, body, config);
 
     console.log(response);
 
@@ -49,7 +50,7 @@ function SignUp({setLoginType}) {
     if (data.success === true) {
       alert("Admin Successfully registered! Please login to continue");
       setLoginType("admin");
-      navigate("/home")
+      navigate("/adminlogin")
 
     }
     
@@ -148,7 +149,7 @@ function SignUp({setLoginType}) {
 
           {/** Link to login page */}
           <div className="mt-4 text-center">
-            <p className="text-gray-700">Already have an account? <a href="/home" className="text-blue-500 hover:underline">Login here</a></p>
+            <p className="text-gray-700">Already have an account? <a href="/adminlogin" className="text-blue-500 hover:underline">Login here</a></p>
           </div>
           
         </form>

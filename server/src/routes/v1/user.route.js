@@ -1,8 +1,9 @@
 import Router from 'express';
-import { acceptDailyReport, getUserProfile, loginUser, logoutUser, updateAvatar, updateProfile } from '../../controllers/v1/user.controllers.js';
+import { acceptDailyReport, getDailyReportByDate, getLeaveHistory, getUserProfile, loginUser, logoutUser, updateAvatar, updateProfile } from '../../controllers/v1/user.controllers.js';
 import {upload} from '../../middlewares/multer.middleware.js';
 import { isUserLoggedIn } from '../../middlewares/user.auth.middleware.js';
 import { acceptLeaveApplication, addTask } from '../../controllers/v1/user.leave.controller.js';
+import { sendSnapshot } from '../../controllers/v1/snapshot.controller.js';
 
 
 
@@ -29,7 +30,7 @@ UserRouter.route("/uploadAvatar").post (
 
 
 
-UserRouter.route("/updateProfile").post (
+UserRouter.route("/updateProfile").post(
 
     isUserLoggedIn,
     upload.single("avatar"),
@@ -57,8 +58,30 @@ UserRouter.route("/addTask").post (
 
 UserRouter.route("/dailyReport").post (
     isUserLoggedIn,
+    upload.none(),
     acceptDailyReport
 )
+
+
+
+UserRouter.route("/sendSnapshot").post (
+
+    isUserLoggedIn,
+    upload.single("photo"),
+    sendSnapshot
+)
+
+
+
+UserRouter.route("/getDailyReport").post(
+
+    isUserLoggedIn,
+    upload.none(),
+    getDailyReportByDate
+)
+
+
+
 
 
 
@@ -68,6 +91,12 @@ UserRouter.route("/dailyReport").post (
 UserRouter.route("/getUserProfile").get(
     isUserLoggedIn,
     getUserProfile
+)
+
+
+UserRouter.route("/getLeaveHistory").get(
+    isUserLoggedIn,
+    getLeaveHistory
 )
 
 

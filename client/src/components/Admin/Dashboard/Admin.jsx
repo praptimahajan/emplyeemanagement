@@ -1,73 +1,130 @@
 import { useEffect, useState } from 'react'
-import Footer from '../Footer/Footer';
 import Sidebar from '../Sidebar/Sidebar';
+import {serverUrl} from "../../../Url/url.backend.js";
 
-import Manage from '../../../views/Manage/Manage';
 
 import Notifications from '../../../views/Notifications/Notifications';
 import Report from '../../../views/Report/Report';
 
 import axios from 'axios';
 import AdminProfiles from '../AdminProfile/AdminProfiles';
+import { toast } from 'sonner';
+import LeaveStatus from '../LeaveStatus/LeaveStatus';
+import Announcement from '../../../views/Announcement/Announcement';
+import History from '../../../views/History/History';
+import Manage from '../Manage/Manage';
 
 
 
 function Admin() {
-
+  const theme = localStorage.getItem('theme');
   const [activeBox, setActiveBox] = useState("");
-
   const [totalEmployee, setTotalEmployee] = useState(0);
-  
+  const [leaveRequest, setLeaveRequest] = useState(0);
+  const [acceptLeave, setAcceptLeave] = useState(0);
+
   let count = 0;
 
   const [activeUsers, setActiveUsers] = useState(0);
 
   const getEmployee = async () => {
-    
+
 
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-      
+
       withCredentials: true
     };
-    
-      
-  try {
-    
-    const response = await axios("http://localhost:5200/api/v1/admin/getUsers", config);
-
-    const data = response.data;
-
-    // set the total emplyees 
-    setTotalEmployee(data.data.length);
-
-    console.log(data.data);
 
 
-    const info = data.data;
+    try {
 
-    
-    
-    info.map((e) =>{
+      const response = await axios(`${serverUrl || "http://localhost:5200" }/api/v1/admin/getUsers`, config);
 
-      if(e.isActive) {
-        count++;
-      }
+      const data = response.data;
 
-    })
+      // set the total emplyees 
+      setTotalEmployee(data.data.length);
 
-    setActiveUsers(count);
+      console.log(data.data);
 
 
-    
+      const info = data.data;
 
 
-  } 
-  catch (error) {
-    console.log(error);
+
+      info.map((e) => {
+
+        if (e.isActive) {
+          count++;
+        }
+
+      })
+
+      setActiveUsers(count);
+
+
+
+
+
+    }
+    catch (error) {
+      console.log(error);
+    }
+
   }
+
+  const getLeaveRequest = async () => {
+
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+
+      withCredentials: true
+    };
+
+    try {
+
+      const response = await axios.get(`${serverUrl || "http://localhost:5200" }/api/v1/admin/getLeaveEmployee`, config)
+
+      console.log(response.data);
+
+      const data = response.data;
+
+
+      const check = data.data;
+
+
+      let approved = 0;
+      let request = 0;
+
+      await check.map((e) => {
+
+        if (e.leaveStatus === "approved") {
+          approved++;
+        }
+      })
+      await check.map((e) => {
+
+        if (e.leaveStatus === "pending") {
+          request++;
+        }
+      })
+
+      setLeaveRequest(request);
+
+      setAcceptLeave(approved);
+
+
+
+    }
+    catch (error) {
+      console.log(error);
+      toast.error("Error");
+    }
 
   }
 
@@ -75,48 +132,52 @@ function Admin() {
   useEffect(() => {
     getEmployee();
 
+
   })
-  
+
+  useEffect(() => {
+    getLeaveRequest();
+  }, [leaveRequest])
 
 
   return (
 
-    <div className="min-h-screen bg-gray-50/50">
+    <div className={`${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-gray-50 border-gray-200'} min-h-screen  dark:bg-black from-slate-100 to-slate-600 bg-gray-50/50`}>
 
-  
+
       <div className="p-4 xl:ml-80">
-  
-        <Sidebar setActiveBox={setActiveBox} />
+
+        <Sidebar activeBox={activeBox} setActiveBox={setActiveBox} />
 
         <div className="mt-12">
 
           <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
 
 
-              { /* total Employee block */ }
+            { /* total Employee block */}
 
-            <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+            <div className="relative dark:bg-gray-900 dark:text-white flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
               <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-blue-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-                className="w-6 h-6 text-white"
-              >
-                <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
-                <path
-                  fillRule="evenodd"
-                  d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z"
-                  clipRule="evenodd"
-                />
-                <path d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z" />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  className="w-6 h-6 text-white"
+                >
+                  <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z"
+                    clipRule="evenodd"
+                  />
+                  <path d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z" />
+                </svg>
               </div>
 
               <div className="p-4 text-right">
                 <p className="block antialiased font-sans text-lg font-semibold leading-normal  text-blue-gray-600">
-                  Total Employee 
+                  Total Employee
                 </p>
                 <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
                   {totalEmployee}
@@ -132,9 +193,9 @@ function Admin() {
 
             </div>
 
-            { /* active Employees */ }
+            { /* active Employees */}
 
-            <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+            <div className="relative dark:bg-gray-900 dark:text-white flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
               <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white shadow-pink-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -165,10 +226,12 @@ function Admin() {
               </div>
             </div>
 
-            { /* New Employees */ }
+            { /* Leave request Employees */}
 
-            <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
-              <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
+            <div className="relative dark:bg-gray-900 dark:text-white flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+              <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-green-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center"
+                onClick={() => setActiveBox("leave")}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -181,10 +244,10 @@ function Admin() {
               </div>
               <div className="p-4 text-right">
                 <p className="block antialiased font-sans text-lg leading-normal font-semibold text-blue-gray-600">
-                  Leave Requests 
+                  Leave Requests
                 </p>
                 <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-                  25
+                  {leaveRequest}
                 </h4>
               </div>
               <div className="border-t border-blue-gray-50 p-4">
@@ -195,7 +258,7 @@ function Admin() {
             </div>
 
             { /** the leave employees */}
-            <div className="relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
+            <div className="relative dark:bg-gray-900 dark:text-white flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md">
               <div className="bg-clip-border mx-4 rounded-xl overflow-hidden bg-gradient-to-tr from-orange-600 to-orange-400 text-white shadow-orange-500/40 shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -209,10 +272,10 @@ function Admin() {
               </div>
               <div className="p-4 text-right">
                 <p className="block antialiased font-sans text-lg leading-normal font-semibold text-blue-gray-600">
-                  Today Leave 
+                  Today Leave
                 </p>
                 <h4 className="block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900">
-                  5
+                  {acceptLeave}
                 </h4>
               </div>
               <div className="border-t border-blue-gray-50 p-4">
@@ -224,28 +287,34 @@ function Admin() {
 
           </div>
 
-          <div> 
+          <div>
 
-            { activeBox === "profile" && <AdminProfiles />}
+            {activeBox === "profile" && <AdminProfiles />}
 
-            {activeBox === "manage" && <Manage />}
-            {activeBox === "notifications" && <Notifications/>}
-            {activeBox === "report" && <Report/>}
+            {activeBox === "manage" && <Manage className="my-16" />}
+            {activeBox === "notifications" && <Notifications />}
+            {activeBox === "report" && <Report />}
 
             {activeBox === "" && <Manage />}
-          
+
+            {activeBox === "leave" && <LeaveStatus />}
+            {activeBox === "announcement" && <Announcement />}
+            {activeBox === "history" && <History />}
+
+
+
           </div>
-          
+
         </div>
 
-        
-        <Footer />
-        
+
+
 
       </div>
     </div>
-   
+
   )
 }
+
 
 export default Admin

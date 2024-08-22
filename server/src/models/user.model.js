@@ -15,11 +15,24 @@ const userSchema = new Schema (
 
         },
 
+        phoneNumber:{
+            type:Number
+        },
+
+        bio:{
+            type:String
+        },
+
 
         firstName:{
             type:String,
             required:true,
             minlength: 3 
+        },
+
+        bio:{
+            type:String,
+            // required:true
         },
 
         lastName:{
@@ -31,12 +44,14 @@ const userSchema = new Schema (
             type:String,
             
              // Ensure email is unique
+            unique: true,
             match: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
         },
 
         password:{
             type:String,
-            required:true
+            required:true,
+          
         },
 
         avatar:{
@@ -49,7 +64,10 @@ const userSchema = new Schema (
 
         isActive:{
             type:Boolean,
-            default:true
+            default:false,
+            expiresIn: "2m",
+            
+            
         },
 
         role:{
@@ -75,10 +93,65 @@ const userSchema = new Schema (
         },
 
 
+        employeeNotices: [{
+            
+            
+            message: {
+                type: String,
+                expires: "50d",
+               
+            },
+
+            createdAt: {
+                type: Date,
+                expires: "5d",
+                default: Date.now,
+              
+            },
+
+            createdBy: {
+                type: String,
+                required: true
+            
+            },
+            
+            
+        }],
+
+
         dailyReports: [{
-            type: String,
-            enum: ['Daily', 'Weekly', 'Monthly'],
-            required: true
+
+            projectName: {
+                type: String,
+                
+            },
+
+            workUrl: {
+                type: String,
+                
+            },
+            
+            report: {
+                type: String,
+                
+            },
+
+
+            time: {
+                type: Date,
+                default: Date.now,
+
+            }
+
+
+
+        }],
+
+        snapshots: [{
+           
+            type: Schema.Types.ObjectId,
+            ref: 'Snapshot'
+            
         }],
 
         sessions: [{
@@ -89,7 +162,7 @@ const userSchema = new Schema (
         hasClockedToday: {
             type: Boolean,
             default: false,
-            required:true
+            
         },
 
 
@@ -149,5 +222,5 @@ userSchema.methods = {
 }
 
 
-export const UserModel = model('User',userSchema)
+export const UserModel = model('UserModel',userSchema)
 
