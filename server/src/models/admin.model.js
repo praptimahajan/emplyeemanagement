@@ -46,14 +46,9 @@ const adminSchema = new Schema(
       trim: true,
     },
 
-    PhoneNumber: {
+    phoneNumber: {
       type: Number,
-      validate: {
-        validator: function (value) {
-          return /^\d{10}$/.test(value);
-        },
-        message: "Please enter a valid 10-digit phone number",
-      },
+      
     },
 
     // Internal Fields
@@ -77,6 +72,16 @@ const adminSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    fullName: [{
+      type: String,
+
+    }],
+    
+    reportContent: [{
+      type: String,
+
+    }],
+
 
     createdAt: {
       type: Date,
@@ -95,6 +100,7 @@ adminSchema.methods = {
     return jwt.sign(
       {
         adminId: this._id,
+        adminEmail: this.email,
         role: this.role,
         adminEmail: this.email,
         firstName: this.firstName,

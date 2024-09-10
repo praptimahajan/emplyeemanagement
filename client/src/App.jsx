@@ -10,7 +10,7 @@ import {Landing} from './views/Landing/Landing';
 import Leave from './views/Leave/Leave';
 import Task, { AddTask } from './components/task/Task';
 
-import AdminContextProvider from './Context/AdminContextProvider';
+import { AuthProvider } from './Context/AdminContextProvider';
 
 import { HelpAndSupport } from './components/HelpAndSupport/HelpAndSupport';
 import AdminProfile from './components/Admin/AdminProfile/AdminProfile';
@@ -18,9 +18,23 @@ import AdminForm from './components/Admin/AdminForm/AdminForm';
 import Register from './components/Admin/Register/Register';
 import { FaSign } from 'react-icons/fa';
 import { SignUp } from './components/Admin/SignUp/SignUp';
+import AdmLogin from './components/Login/AdmLogin';
+
+import AutoCapture from './components/ScreenRecorder/AutoCapture';
+import PhotoCapture from './components/ScreenRecorder/PhotoCapture';
+import EmpLogin from './components/Login/EmpLogin';
+import AboutPage from './views/About/About';
+import NotFound from "../src/views/404"
+import Calendar from './views/EmployeeProfile/Calender';
+import WeekPicker from './views/Calender';
 
 
 function App() {
+
+
+  if(localStorage.getItem('theme') === null){
+    localStorage.setItem('theme', 'light');
+  }
 
   const [userType, setUserType] = useState("employee"); // Track user type ('employee' or 'admin')
   
@@ -35,37 +49,37 @@ function App() {
 
 const RoutesWrapper = ({ userType, setUserType, setLoginType, loginType }) => {
   return (
-    <AdminContextProvider>
-    
-      <Navbar userType={userType} setUserType={setUserType} /> {/* Conditionally render Navbar */}
+    <AuthProvider>
+      <Navbar userType={userType} setUserType={setUserType} />{" "}
+      {/* Conditionally render Navbar */}
       <Routes>
-      <Route path='/' element={<Landing setLoginType={setLoginType}/> } />
-
+        {userType!== "admin" ? (
+          <Route path="/emp-dashboard" element={<EmployeeDashboard />} />
+          
+        ) : null}
+        <Route path="/" element={<Landing setLoginType={setLoginType} />} />
         <Route path="/home" element={<Home loginType={loginType} />} />
         <Route path="/forgot-password" element={<ForgotPass />} />
-        <Route path="/emp-dashboard" element={<EmployeeDashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard/>} /> {/* Add Admin Dashboard route */}
-      
-        <Route path='/support' element={<HelpAndSupport/>} />
-        <Route path="/leave" element={<Leave />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />{" "}
+        {/* Add Admin Dashboard route */}
+        <Route path="/support" element={<HelpAndSupport />} />
         <Route path="/sign-up" element={<SignUp />} />
-        
-
-
-
-
+        <Route path="/adminlogin" element={<AdmLogin />} />
+        <Route path="/emplogin" element={<EmpLogin />} />
+        <Route path="/cap" element={<PhotoCapture />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/ca" element={<WeekPicker />} />
+        <Route path="/*" element={<NotFound />} />
         {/***  testing routes  */}
         <Route path="/task" element={<Task />} />
         <Route path="/addtask" element={<AddTask />} />
         <Route path="/admin-profile" element={<AdminProfile />} />
         <Route path="/form" element={<AdminForm />} />
         <Route path="/register" element={<Register />} />
-
-
-      {/****  this is the comment  */}
-      
-        </Routes>
-    </AdminContextProvider>
+        <Route path="/screen" element={<AutoCapture />} />
+        {/****  this is the comment  */}
+      </Routes>
+    </AuthProvider>
   );
 };
 
